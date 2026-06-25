@@ -18,6 +18,7 @@ namespace FigmaToUnity.Core
         AspectRatio,
         HugContents,
         Container,
-        Ignore
+        Ignore,
+        PrefabRef
     }
 }

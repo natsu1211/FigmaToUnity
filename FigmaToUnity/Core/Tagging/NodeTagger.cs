@@ -58,10 +58,27 @@ namespace FigmaToUnity.Core
             {
                 node.ForceContainer = true;
             }
+
+            // "#use:<path-or-name>" binds this node to an existing project prefab. The
+            // node itself becomes a positioned anchor; its Figma subtree is dropped so
+            // nothing is built or fetched for it (the external prefab replaces it).
+            if (ManualTagParser.TryParseExternalPrefab(node.Name, out string externalPrefabReference))
+            {
+                node.Tags.Add(NodeTag.PrefabRef);
+                node.ExternalPrefabPath = externalPrefabReference;
+                IgnoreDescendants(node);
+            }
         }
 
         private static void ApplyFigmaTags(DesignNode node)
         {
+            // A #use: node is replaced wholesale by an external prefab, so it must not pick
+            // up Image/Text/AutoLayout/etc. tags that would add components to the anchor.
+            if (node.Tags.Contains(NodeTag.PrefabRef))
+            {
+                return;
+            }
+
             if (node.Type == "TEXT")
             {
                 node.Tags.Add(NodeTag.Text);
@@ -105,6 +122,11 @@ namespace FigmaToUnity.Core
 
         private static void ApplySmartTags(DesignNode node, DesignNode? parent)
         {
+            if (node.Tags.Contains(NodeTag.PrefabRef))
+            {
+                return;
+            }
+
             if (!TaggingRules.IsVisible(node))
             {
                 node.IgnoreNode = true;

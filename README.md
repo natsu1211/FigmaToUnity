@@ -83,6 +83,21 @@ Append `#tagname` to the end of a Figma node name to force a specific Unity comp
 | `#scroll` | Add a UGUI `ScrollRect` (see constraints below) |
 | `#mask` | Add a UGUI `Mask` / `RectMask2D` |
 | `#ignore` | Exclude this node and its descendants from import |
+| `#use:<path-or-name>` | Instantiate an **existing project prefab** in place of this node instead of generating one from the Figma subtree (UGUI backend only) |
+
+### Using `#use:` (reuse an existing prefab)
+
+Bind a node to a prefab that already lives in your project — useful for hand-authored widgets you don't want regenerated from the design. The node's own Figma children are dropped; the referenced prefab is instantiated at the node's position.
+
+```
+SaveButton #use:Assets/UI/Prefabs/SaveButton.prefab   ← exact asset path
+SaveButton #use:SaveButton                            ← bare name, resolved by project-wide search
+```
+
+- The reference is treated as a **path** when it contains `/` or ends in `.prefab` (a leading `Assets/` and the `.prefab` extension are added if missing); otherwise it's resolved by name via `AssetDatabase` (first prefab whose file name matches).
+- Only **placement** (anchors / pivot / anchored position) from the Figma node is applied — the prefab keeps its own authored size.
+- In **Diff Update**, an unchanged `#use:` node keeps its existing instance (and any manual overrides); it's only re-instantiated when the reference changes.
+- If the prefab can't be resolved, the node is left as an empty placeholder and a message is logged.
 
 ### Using `#scroll` (current constraints)
 

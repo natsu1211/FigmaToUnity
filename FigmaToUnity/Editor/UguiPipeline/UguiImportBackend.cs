@@ -30,6 +30,7 @@ namespace FigmaToUnity.Editor.UguiPipeline
         private readonly LayoutApplier _layoutApplier = new();
         private readonly ComponentApplier _componentApplier = new();
         private readonly PrefabPipeline _prefabPipeline = new();
+        private readonly ExternalPrefabPipeline _externalPrefabPipeline = new();
         private readonly DiffPlanner _diffPlanner = new();
 
         public UguiImportBackend(FigmaApiClient apiClient)
@@ -121,6 +122,11 @@ namespace FigmaToUnity.Editor.UguiPipeline
             await ApplyChunkedAsync(context, builtNodes, "Apply Components",
                 "Adding Button/Mask/ScrollRect ({0}/{1}).",
                 chunk => _componentApplier.Apply(chunk));
+
+            // Replace "#use:" anchors with instances of existing project prefabs before the
+            // prefab-generation pass (which skips these nodes via their ExternalPrefabPath).
+            context.Report("Resolve External Prefabs", "Instantiating existing project prefabs for #use: nodes.", 0, builtNodes.Count, false, true);
+            _externalPrefabPipeline.Apply(builtNodes, context.Log);
 
             context.Report("Generate Prefabs", "Planning and emitting explicit and component-based prefabs.", 0, builtNodes.Count, false, true);
             PrefabPlanSet prefabPlans = _prefabPipeline.BuildPlans(

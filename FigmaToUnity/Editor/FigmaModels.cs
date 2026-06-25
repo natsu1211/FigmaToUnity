@@ -53,6 +53,8 @@ namespace FigmaToUnity.Editor
 
         public bool ExplicitPrefab { get => Design.ExplicitPrefab; set => Design.ExplicitPrefab = value; }
 
+        public string? ExternalPrefabPath { get => Design.ExternalPrefabPath; set => Design.ExternalPrefabPath = value; }
+
         public int NodeHash { get => Design.NodeHash; set => Design.NodeHash = value; }
 
         // Proxy properties - geometry

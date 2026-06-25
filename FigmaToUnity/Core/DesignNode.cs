@@ -209,6 +209,13 @@ namespace FigmaToUnity.Core
             set => Annotations.ExplicitPrefab = value;
         }
 
+        [JsonIgnore]
+        public string? ExternalPrefabPath
+        {
+            get => Annotations.ExternalPrefabPath;
+            set => Annotations.ExternalPrefabPath = value;
+        }
+
         public bool ShouldSerializeAnnotations() => !Annotations.IsEmpty;
     }
 }

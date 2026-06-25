@@ -158,6 +158,13 @@ namespace FigmaToUnity.Editor.ImportPipeline
 
         private static PrefabPlanKind GetPlanKind(FigmaNode node)
         {
+            // Nodes bound to an existing project prefab via "#use:" are handled by
+            // ExternalPrefabPipeline; never emit a new prefab asset for them.
+            if (!string.IsNullOrWhiteSpace(node.ExternalPrefabPath))
+            {
+                return PrefabPlanKind.None;
+            }
+
             if (node.ExplicitPrefab)
             {
                 return PrefabPlanKind.Explicit;

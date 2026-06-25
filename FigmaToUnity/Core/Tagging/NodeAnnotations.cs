@@ -24,6 +24,15 @@ namespace FigmaToUnity.Core
         [JsonProperty("explicitPrefab", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool ExplicitPrefab { get; set; }
 
+        /// <summary>
+        /// When set (via a <c>#use:&lt;path-or-name&gt;</c> manual tag), the node is not
+        /// built from its Figma children; instead an existing project prefab matching this
+        /// reference is instantiated in its place. Holds either an asset path
+        /// (e.g. <c>Assets/UI/MyButton.prefab</c>) or a bare prefab name (e.g. <c>MyButton</c>).
+        /// </summary>
+        [JsonProperty("externalPrefabPath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string? ExternalPrefabPath { get; set; }
+
         [JsonIgnore]
         public bool IsEmpty =>
             Tags.Count == 0 &&
@@ -31,7 +40,8 @@ namespace FigmaToUnity.Core
             !ForceImage &&
             !ForceContainer &&
             !IgnoreNode &&
-            !ExplicitPrefab;
+            !ExplicitPrefab &&
+            string.IsNullOrEmpty(ExternalPrefabPath);
 
         public bool ShouldSerializeTags() => Tags.Count > 0;
     }

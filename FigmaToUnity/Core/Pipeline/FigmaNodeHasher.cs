@@ -54,6 +54,7 @@ namespace FigmaToUnity.Core
             hash.Add(node.ForceImage);
             hash.Add(node.ForceContainer);
             hash.Add(node.IgnoreNode);
+            hash.Add(node.ExternalPrefabPath);
 
             if (node.AbsoluteBoundingBox != null)
             {
