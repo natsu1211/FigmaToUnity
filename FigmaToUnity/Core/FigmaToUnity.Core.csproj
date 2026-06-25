@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Output redirect (BaseOutputPath / BaseIntermediateOutputPath) lives in
+    Directory.Build.props at the repo root so it is applied before
+    Microsoft.Common.props imports.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>FigmaToUnity.Core</RootNamespace>
+    <AssemblyName>FigmaToUnity.Core</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <!--
+    Unity-only artifacts that live next to source. They are harmless to the
+    SDK-style build (which only compiles .cs), but excluding them keeps the
+    project tree in IDEs tidy.
+  -->
+  <ItemGroup>
+    <None Remove="**\*.meta" />
+    <None Remove="**\*.asmdef" />
+    <None Remove="**\*.rsp" />
+  </ItemGroup>
+
+</Project>

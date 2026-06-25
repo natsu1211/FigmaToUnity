@@ -1,0 +1,18 @@
+<Project>
+
+  <!--
+    Redirect build output outside the Unity package directory tree.
+    Unity scans package folders for DLLs and would otherwise import
+    the dotnet-built assemblies as plugins, clashing with the
+    asmdef-compiled versions.
+
+    Must live in Directory.Build.props (imported before Microsoft.Common.props)
+    rather than in individual .csproj files, otherwise NuGet writes
+    restore artifacts to the default obj/ before the redirect takes effect.
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+</Project>

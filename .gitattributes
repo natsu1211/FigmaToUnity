@@ -1,0 +1,5 @@
+# Normalize line endings on commit; check out native per-platform.
+* text=auto
+
+*.pdf binary
+*.png binary

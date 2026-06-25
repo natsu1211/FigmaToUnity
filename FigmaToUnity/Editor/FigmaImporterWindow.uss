@@ -1,0 +1,279 @@
+.root {
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    background-color: rgb(28, 30, 34);
+}
+
+/* ── Hero ── */
+
+.hero-section {
+    margin-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgb(70, 76, 88);
+    border-right-color: rgb(70, 76, 88);
+    border-bottom-color: rgb(70, 76, 88);
+    border-left-color: rgb(70, 76, 88);
+    background-color: rgb(39, 42, 48);
+}
+
+.hero-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(242, 244, 247);
+    margin-bottom: 4px;
+}
+
+.hero-subtitle {
+    color: rgb(160, 166, 176);
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.status-pill {
+    align-self: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-top-left-radius: 999px;
+    border-top-right-radius: 999px;
+    border-bottom-left-radius: 999px;
+    border-bottom-right-radius: 999px;
+    background-color: rgb(52, 58, 67);
+    color: rgb(200, 206, 214);
+    font-size: 11px;
+}
+
+/* ── Section card ── */
+
+.section {
+    margin-bottom: 10px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgb(52, 56, 64);
+    border-right-color: rgb(52, 56, 64);
+    border-bottom-color: rgb(52, 56, 64);
+    border-left-color: rgb(52, 56, 64);
+    background-color: rgb(34, 37, 42);
+}
+
+.section-title {
+    color: rgb(240, 242, 245);
+    font-size: 13px;
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+    letter-spacing: 0.3px;
+}
+
+.section-description {
+    color: rgb(140, 146, 158);
+    font-size: 11px;
+}
+
+.section-divider {
+    height: 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: rgb(56, 62, 72);
+}
+
+/* ── Subsection (nested card) ── */
+
+.subsection {
+    margin-top: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgb(56, 62, 70);
+    border-right-color: rgb(56, 62, 70);
+    border-bottom-color: rgb(56, 62, 70);
+    border-left-color: rgb(56, 62, 70);
+    background-color: rgb(29, 32, 37);
+}
+
+.subsection-title {
+    color: rgb(200, 204, 212);
+    font-size: 11px;
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+}
+
+.subsection-divider {
+    height: 1px;
+    margin-top: 6px;
+    margin-bottom: 8px;
+    background-color: rgb(50, 55, 64);
+}
+
+/* ── Buttons ── */
+
+.toolbar-row {
+    flex-direction: row;
+}
+
+.import-button {
+    flex-grow: 1;
+    height: 28px;
+    margin-right: 6px;
+    background-color: rgb(50, 110, 200);
+    border-top-color: rgb(70, 130, 220);
+    border-right-color: rgb(70, 130, 220);
+    border-bottom-color: rgb(40, 90, 170);
+    border-left-color: rgb(70, 130, 220);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.import-button:hover {
+    background-color: rgb(60, 125, 220);
+}
+
+.import-button:disabled {
+    background-color: rgb(50, 54, 62);
+    border-top-color: rgb(58, 63, 72);
+    border-right-color: rgb(58, 63, 72);
+    border-bottom-color: rgb(58, 63, 72);
+    border-left-color: rgb(58, 63, 72);
+    color: rgb(110, 114, 122);
+}
+
+.cancel-button {
+    width: 80px;
+    height: 28px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* ── Frames list ── */
+
+.frame-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(44, 48, 56);
+}
+
+.frames-box {
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-color: rgb(24, 26, 30);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgb(48, 52, 60);
+    border-right-color: rgb(48, 52, 60);
+    border-bottom-color: rgb(48, 52, 60);
+    border-left-color: rgb(48, 52, 60);
+}
+
+/* ── Progress & Logs ── */
+
+.stage-label {
+    color: rgb(200, 204, 212);
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.log-box {
+    min-height: 150px;
+    max-height: 240px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgb(48, 52, 60);
+    border-right-color: rgb(48, 52, 60);
+    border-bottom-color: rgb(48, 52, 60);
+    border-left-color: rgb(48, 52, 60);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-color: rgb(22, 24, 28);
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.log-box Label {
+    color: rgb(160, 165, 175);
+    font-size: 11px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.log-box .unity-text-element {
+    color: rgb(160, 165, 175);
+    font-size: 11px;
+}
+
+.log-box > .unity-base-field__input,
+.log-box .unity-base-text-field__input {
+    background-color: rgba(0, 0, 0, 0);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* ── Generic ── */
+
+.muted {
+    color: rgb(130, 136, 146);
+    font-size: 11px;
+}

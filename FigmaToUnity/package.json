@@ -1,0 +1,29 @@
+{
+  "name": "com.longgames.figma-to-unity",
+  "displayName": "Figma To Unity",
+  "version": "0.1.1",
+  "unity": "2022.3",
+  "license": "MIT",
+  "description": "Unity Editor package for importing Figma frame trees into Unity UI (UGUI and UIToolkit).",
+  "keywords": [
+    "figma",
+    "ugui",
+    "uitoolkit",
+    "unity",
+    "editor",
+    "ui"
+  ],
+  "author": {
+    "name": "natsu1211",
+    "url": "https://github.com/natsu1211"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natsu1211/FigmaToUnity.git"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.2",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "FigmaToUnity.Editor",
+  "rootNamespace": "FigmaToUnity.Editor",
+  "references": [
+    "FigmaToUnity.Core",
+    "FigmaToUnity.Runtime",
+    "Unity.Newtonsoft.Json",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
