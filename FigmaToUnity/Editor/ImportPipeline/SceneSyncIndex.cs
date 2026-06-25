@@ -23,6 +23,21 @@ namespace FigmaToUnity.Editor.ImportPipeline
             return index;
         }
 
+        // Indexes only markers under a single root (the prefab contents root when importing
+        // inside an open Prefab Stage). A global scene scan would also pick up markers from
+        // the hidden main scene behind the prefab stage, so diff updates must stay scoped.
+        public static SceneSyncIndex BuildFromRoot(Transform root)
+        {
+            SceneSyncIndex index = new();
+            FigmaSyncMarker[] markers = root.GetComponentsInChildren<FigmaSyncMarker>(true);
+            foreach (FigmaSyncMarker marker in markers)
+            {
+                index.IndexMarker(marker);
+            }
+
+            return index;
+        }
+
         public bool IsInvalidRoot(string rootFrameNodeId)
         {
             return _invalidRootFrameIds.Contains(rootFrameNodeId);

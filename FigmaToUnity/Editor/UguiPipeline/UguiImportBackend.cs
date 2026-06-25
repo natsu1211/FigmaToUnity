@@ -44,10 +44,22 @@ namespace FigmaToUnity.Editor.UguiPipeline
             SceneSyncIndex? sceneSyncIndex = null;
             DiffPlan? diffPlan = null;
 
+            // When a Prefab Stage is open, import into the prefab being edited instead of the
+            // scene: new content is parented under the prefab root and the prefab stage scene
+            // is the one we mark dirty.
+            PrefabStage? prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            Transform? importParent = prefabStage != null ? prefabStage.prefabContentsRoot.transform : null;
+            if (prefabStage != null)
+            {
+                context.Log($"Prefab edit mode detected — importing under prefab root '{prefabStage.prefabContentsRoot.name}'.");
+            }
+
             if (importMode == ImportModeKind.DiffUpdate)
             {
                 context.Report("Plan Diff", "Scanning existing scene sync markers.", 0, context.ImportedRootNodes.Count, false, true);
-                sceneSyncIndex = SceneSyncIndex.BuildActiveSceneIndex();
+                sceneSyncIndex = prefabStage != null
+                    ? SceneSyncIndex.BuildFromRoot(prefabStage.prefabContentsRoot.transform)
+                    : SceneSyncIndex.BuildActiveSceneIndex();
                 diffPlan = _diffPlanner.Create(context.ImportedRootNodes, sceneSyncIndex);
                 LogDiffSummary(diffPlan, context.Log);
                 DestroyFallbackCanvases(diffPlan, sceneSyncIndex);
@@ -76,8 +88,8 @@ namespace FigmaToUnity.Editor.UguiPipeline
 
             context.Report("Build Hierarchy", "Creating Canvas and RectTransform hierarchy.", 0, context.ImportedRootNodes.Count, false, true);
             List<FigmaNode> builtNodes = importMode == ImportModeKind.DiffUpdate && sceneSyncIndex != null && diffPlan != null
-                ? _hierarchyBuilder.Build(context.ImportedRootNodes, session.FigmaFileName, sceneSyncIndex, diffPlan)
-                : _hierarchyBuilder.Build(context.ImportedRootNodes, session.FigmaFileName);
+                ? _hierarchyBuilder.Build(context.ImportedRootNodes, session.FigmaFileName, sceneSyncIndex, diffPlan, importParent)
+                : _hierarchyBuilder.Build(context.ImportedRootNodes, session.FigmaFileName, importParent: importParent);
             context.Log($"Prepared {builtNodes.Count} GameObject node(s) in the scene.");
 
             if (importMode == ImportModeKind.DiffUpdate && sceneSyncIndex != null && diffPlan != null)
@@ -131,7 +143,7 @@ namespace FigmaToUnity.Editor.UguiPipeline
 
             await RebuildLayoutsChunkedAsync(context, builtNodes);
             Canvas.ForceUpdateCanvases();
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            EditorSceneManager.MarkSceneDirty(prefabStage != null ? prefabStage.scene : SceneManager.GetActiveScene());
 
             if (context.ImportedRootNodes.Count > 0 && context.ImportedRootNodes[0].GameObject != null)
             {

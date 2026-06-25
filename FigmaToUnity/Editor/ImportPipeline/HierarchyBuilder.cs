@@ -10,15 +10,18 @@ namespace FigmaToUnity.Editor.ImportPipeline
     {
         private SceneSyncIndex? _sceneSyncIndex;
         private DiffPlan? _diffPlan;
+        private Transform? _importParent;
 
         public List<FigmaNode> Build(
             IReadOnlyList<FigmaNode> rootNodes,
             string figmaFileName,
             SceneSyncIndex? sceneSyncIndex = null,
-            DiffPlan? diffPlan = null)
+            DiffPlan? diffPlan = null,
+            Transform? importParent = null)
         {
             _sceneSyncIndex = sceneSyncIndex;
             _diffPlan = diffPlan;
+            _importParent = importParent;
 
             List<FigmaNode> builtNodes = new();
 
@@ -34,6 +37,7 @@ namespace FigmaToUnity.Editor.ImportPipeline
 
             _sceneSyncIndex = null;
             _diffPlan = null;
+            _importParent = null;
             return builtNodes;
         }
 
@@ -48,6 +52,15 @@ namespace FigmaToUnity.Editor.ImportPipeline
 
             EnsureCanvasComponents(canvasObject, rootNode);
             canvasObject.name = canvasName;
+
+            // When importing into an open Prefab Stage, freshly created canvases live in
+            // the (hidden) main scene by default. Re-parent them under the prefab root so
+            // the imported content becomes part of the prefab being edited. Reused canvases
+            // are already in the correct place, so they are left untouched.
+            if (!useReuse && _importParent != null)
+            {
+                canvasObject.transform.SetParent(_importParent, false);
+            }
 
             CreateNodeRecursive(rootNode, canvasObject.transform, builtNodes, useReuse, 0, ancestorPrefix: null);
         }
