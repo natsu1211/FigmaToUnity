@@ -57,6 +57,8 @@ namespace FigmaToUnity.Editor
         // Cap log buffer well below that and drop oldest lines on overflow.
         private const int MaxLogLines = 200;
         private const int MaxLogChars = 10000;
+        private const string FoldoutClosed = "▶"; // ▶
+        private const string FoldoutOpen = "▼";   // ▼
         private readonly Queue<string> _logEntries = new();
         private int _logsCharCount;
         private UIButton _verifyButton = null!;
@@ -602,21 +604,168 @@ namespace FigmaToUnity.Editor
 
             foreach (FrameSummary frame in frames)
             {
-                VisualElement row = new();
-                row.AddToClassList("frame-row");
+                VisualElement frameContainer = new();
+                frameContainer.AddToClassList("frame-container");
+
+                VisualElement header = new();
+                header.AddToClassList("frame-row");
+
+                VisualElement left = new();
+                left.AddToClassList("tree-row-left");
+
+                // Lazily-populated container for the frame's internal node tree.
+                VisualElement childrenContainer = new();
+                childrenContainer.AddToClassList("frame-children");
+                childrenContainer.style.display = DisplayStyle.None;
+
+                bool expanded = false;
+                bool loaded = false;
+                UIButton expandButton = null!;
+                expandButton = new UIButton(async () =>
+                {
+                    expanded = !expanded;
+                    expandButton.text = expanded ? FoldoutOpen : FoldoutClosed;
+
+                    if (expanded && !loaded)
+                    {
+                        expandButton.SetEnabled(false);
+                        try
+                        {
+                            DesignNode tree = await _controller!.LoadFrameTreeAsync(session, frame.Id);
+                            if (tree.Children != null)
+                            {
+                                foreach (DesignNode child in tree.Children)
+                                {
+                                    BuildNodeRow(child, childrenContainer, 1);
+                                }
+                            }
+
+                            loaded = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            expanded = false;
+                            expandButton.text = FoldoutClosed;
+                            ShowFailureState("Load frame structure failed", ex.Message);
+                        }
+                        finally
+                        {
+                            expandButton.SetEnabled(true);
+                        }
+                    }
+
+                    childrenContainer.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                })
+                {
+                    text = FoldoutClosed
+                };
+                expandButton.AddToClassList("tree-expand");
 
                 UIToggle toggle = new(frame.Name)
                 {
                     value = session.SelectedFrameIds.Contains(frame.Id)
                 };
                 toggle.RegisterValueChangedCallback(evt => OnFrameSelectionChanged(frame.Id, evt.newValue));
+
+                left.Add(expandButton);
+                left.Add(toggle);
+
                 Label sizeLabel = new($"({frame.Width:0} x {frame.Height:0})");
                 sizeLabel.AddToClassList("muted");
 
-                row.Add(toggle);
-                row.Add(sizeLabel);
-                _framesView.Add(row);
+                header.Add(left);
+                header.Add(sizeLabel);
+
+                frameContainer.Add(header);
+                frameContainer.Add(childrenContainer);
+                _framesView.Add(frameContainer);
                 frameToggles[frame.Id] = toggle;
+            }
+        }
+
+        // Renders one node of a frame's internal structure with an include/exclude
+        // checkbox and, when the node has children, a lazy expand arrow. Children are
+        // built on first expand so large trees stay cheap.
+        private void BuildNodeRow(DesignNode node, VisualElement container, int depth)
+        {
+            FigmaImportSession session = _session!;
+
+            VisualElement row = new();
+            row.AddToClassList("node-row");
+            row.style.paddingLeft = depth * 12f;
+
+            bool hasChildren = node.Children != null && node.Children.Count > 0;
+            VisualElement childContainer = new();
+            childContainer.AddToClassList("node-children");
+            childContainer.style.display = DisplayStyle.None;
+
+            if (hasChildren)
+            {
+                bool expanded = false;
+                bool built = false;
+                UIButton expandButton = null!;
+                expandButton = new UIButton(() =>
+                {
+                    expanded = !expanded;
+                    expandButton.text = expanded ? FoldoutOpen : FoldoutClosed;
+                    if (expanded && !built)
+                    {
+                        foreach (DesignNode child in node.Children!)
+                        {
+                            BuildNodeRow(child, childContainer, depth + 1);
+                        }
+
+                        built = true;
+                    }
+
+                    childContainer.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                })
+                {
+                    text = FoldoutClosed
+                };
+                expandButton.AddToClassList("tree-expand");
+                row.Add(expandButton);
+            }
+            else
+            {
+                VisualElement spacer = new();
+                spacer.AddToClassList("tree-expand");
+                row.Add(spacer);
+            }
+
+            string label = string.IsNullOrWhiteSpace(node.Name) ? node.Type : node.Name;
+            UIToggle includeToggle = new(label)
+            {
+                value = !session.ExcludedNodeIds.Contains(node.Id)
+            };
+            includeToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    session.ExcludedNodeIds.Remove(node.Id);
+                }
+                else
+                {
+                    session.ExcludedNodeIds.Add(node.Id);
+                }
+
+                // Excluding a node excludes its whole subtree; reflect that by graying
+                // out (and locking) any child rows already built underneath it.
+                childContainer.SetEnabled(evt.newValue);
+            });
+
+            Label typeLabel = new(node.Type);
+            typeLabel.AddToClassList("muted");
+
+            row.Add(includeToggle);
+            row.Add(typeLabel);
+
+            container.Add(row);
+            container.Add(childContainer);
+
+            if (session.ExcludedNodeIds.Contains(node.Id))
+            {
+                childContainer.SetEnabled(false);
             }
         }
 

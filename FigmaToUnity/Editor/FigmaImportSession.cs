@@ -18,6 +18,20 @@ namespace FigmaToUnity.Editor
         public List<FigmaNode> ImportedRootNodes { get; } = new();
 
         /// <summary>
+        /// Full node subtree per frame, fetched lazily the first time the user expands
+        /// a frame in the selection UI. Keyed by frame node id. Used to render the
+        /// internal structure tree so the import scope can be chosen per node.
+        /// </summary>
+        public Dictionary<string, DesignNode> FrameTrees { get; } = new();
+
+        /// <summary>
+        /// Node ids the user has unchecked in the structure tree. During import these
+        /// are marked <c>IgnoreNode = true</c>, which prunes the node and its whole
+        /// subtree from every backend pass.
+        /// </summary>
+        public HashSet<string> ExcludedNodeIds { get; } = new();
+
+        /// <summary>
         /// When true, each root DesignNode receives the Prefab tag and
         /// ExplicitPrefab=true after tagging so the prefab pipeline emits
         /// a prefab per imported root. Set from the --root-as-prefab CLI flag.

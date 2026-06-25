@@ -122,6 +122,54 @@ namespace FigmaToUnity.Editor
                 });
         }
 
+        public async Task<DesignNode> LoadFrameTreeAsync(FigmaImportSession session, string frameId)
+        {
+            return await RunExclusiveAsync(
+                "Load Frame Structure",
+                async () =>
+                {
+                    if (session.FrameTrees.TryGetValue(frameId, out DesignNode? cached) && cached != null)
+                    {
+                        return cached;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(session.FileKey))
+                    {
+                        if (!FigmaUrlParser.TryParseFileKey(session.FigmaUrl, out string fileKey))
+                        {
+                            throw new ArgumentException("Invalid Figma file URL.");
+                        }
+
+                        session.FileKey = fileKey;
+                    }
+
+                    Report("Load Frame Structure", "Downloading frame node tree.", 0, 0, true, true);
+                    FigmaFileResponse response = await _apiClient.FetchNodesAsync(session.Token, session.FileKey, new[] { frameId }, _scope!.Token);
+
+                    DesignNode? root = null;
+                    if (response.Nodes != null)
+                    {
+                        // The /nodes response is keyed by node id, but Figma may normalize
+                        // the id format. Only one frame was requested, so take the single
+                        // container rather than keying by frameId.
+                        foreach ((string _, FigmaNodeContainer container) in response.Nodes)
+                        {
+                            root = container.Document;
+                            break;
+                        }
+                    }
+
+                    if (root == null)
+                    {
+                        throw new InvalidOperationException($"Figma returned no node tree for frame {frameId}.");
+                    }
+
+                    session.FrameTrees[frameId] = root;
+                    Report("Load Frame Structure", "Frame structure loaded.", 1, 1, false, false);
+                    return root;
+                });
+        }
+
         public async Task StartImportAsync(FigmaImportSession session)
         {
             await RunExclusiveAsync(
@@ -172,6 +220,7 @@ namespace FigmaToUnity.Editor
                     bool rootAsPrefab = session.RootAsPrefab;
                     NodeTagger nodeTagger = _nodeTagger;
                     List<DesignNode> designRoots = session.DesignRootNodes;
+                    HashSet<string> excludedNodeIds = session.ExcludedNodeIds;
                     CancellationToken token = _scope!.Token;
 
                     // Pure-CPU stages run on a background thread. They never touch
@@ -194,6 +243,19 @@ namespace FigmaToUnity.Editor
                             {
                                 rootNode.Tags.Add(NodeTag.Prefab);
                                 rootNode.ExplicitPrefab = true;
+                            }
+                        }
+
+                        // Apply the user-chosen import scope: nodes unchecked in the
+                        // structure tree are marked IgnoreNode, which prunes them and
+                        // their subtrees from every backend pass. Applied after tagging
+                        // and before hashing so the diff/hash reflect the exclusions.
+                        if (excludedNodeIds.Count > 0)
+                        {
+                            foreach (DesignNode rootNode in designRoots)
+                            {
+                                token.ThrowIfCancellationRequested();
+                                ApplyExclusions(rootNode, excludedNodeIds);
                             }
                         }
 
@@ -276,6 +338,27 @@ namespace FigmaToUnity.Editor
                 _scope.Dispose();
                 _scope = null;
                 BusyChanged?.Invoke(false);
+            }
+        }
+
+        private static void ApplyExclusions(DesignNode node, HashSet<string> excludedNodeIds)
+        {
+            if (excludedNodeIds.Contains(node.Id))
+            {
+                // Marking the node is enough: every pass skips an ignored node's whole
+                // subtree, so there is no need to descend further.
+                node.IgnoreNode = true;
+                return;
+            }
+
+            if (node.Children == null)
+            {
+                return;
+            }
+
+            foreach (DesignNode child in node.Children)
+            {
+                ApplyExclusions(child, excludedNodeIds);
             }
         }
 
