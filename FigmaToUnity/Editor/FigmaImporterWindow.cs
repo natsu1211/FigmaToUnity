@@ -25,7 +25,9 @@ namespace FigmaToUnity.Editor
         private TextField _tokenField = null!;
         private TextField _urlField = null!;
         private TextField _outputField = null!;
+        private VisualElement _outputRow = null!;
         private TextField _prefabOutputField = null!;
+        private VisualElement _prefabOutputRow = null!;
         private IntegerField _frameDepthField = null!;
         private IntegerField _spriteScaleField = null!;
         private IntegerField _maxConcurrentDownloadsField = null!;
@@ -193,9 +195,11 @@ namespace FigmaToUnity.Editor
             // Output
             VisualElement outputSection = MakeSection("Output", "Sprite / Prefab asset output directories and emission policy.");
             _outputField = new TextField("Sprite Folder");
-            outputSection.Add(_outputField);
+            _outputRow = MakeFolderPickerRow(_outputField, "Select Sprite Output Folder");
+            outputSection.Add(_outputRow);
             _prefabOutputField = new TextField("Prefab Folder");
-            outputSection.Add(_prefabOutputField);
+            _prefabOutputRow = MakeFolderPickerRow(_prefabOutputField, "Select Prefab Output Folder");
+            outputSection.Add(_prefabOutputRow);
             _enableAutoComponentPrefabsToggle = new UIToggle("Auto Prefab for Top-Level Components");
             _enableAutoComponentPrefabsToggle.tooltip = "When enabled, top-level Figma COMPONENT/INSTANCE nodes are exported as standalone Prefabs. Nested components are baked into their outermost ancestor. Disabled by default to avoid splitting the design into too many small Prefabs. Nodes whose name contains `#prefab` are always turned into Prefabs regardless of this toggle.";
             outputSection.Add(_enableAutoComponentPrefabsToggle);
@@ -339,6 +343,49 @@ namespace FigmaToUnity.Editor
             VisualElement section = new();
             section.AddToClassList("hero-section");
             return section;
+        }
+
+        private VisualElement MakeFolderPickerRow(TextField field, string panelTitle)
+        {
+            field.style.flexGrow = 1f;
+
+            UIButton browseButton = new(() => PickProjectFolder(field, panelTitle))
+            {
+                text = "Browse…",
+                tooltip = "Choose an output folder inside this project's Assets directory.",
+            };
+            browseButton.AddToClassList("folder-browse-button");
+
+            VisualElement row = new();
+            row.AddToClassList("folder-picker-row");
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.alignItems = Align.Center;
+            row.Add(field);
+            row.Add(browseButton);
+            return row;
+        }
+
+        private static void PickProjectFolder(TextField field, string panelTitle)
+        {
+            string current = field.value?.Trim() ?? string.Empty;
+            string startFolder = string.IsNullOrEmpty(current) ? "Assets" : current;
+            string absolute = EditorUtility.OpenFolderPanel(panelTitle, startFolder, string.Empty);
+            if (string.IsNullOrEmpty(absolute))
+            {
+                return; // User cancelled the dialog.
+            }
+
+            string relative = FileUtil.GetProjectRelativePath(absolute);
+            if (string.IsNullOrEmpty(relative) || !relative.StartsWith("Assets", StringComparison.Ordinal))
+            {
+                EditorUtility.DisplayDialog(
+                    "Invalid Folder",
+                    "Please choose a folder inside this project's Assets directory.",
+                    "OK");
+                return;
+            }
+
+            field.value = relative;
         }
 
         private static VisualElement MakeSection(string title, string description)
@@ -621,8 +668,8 @@ namespace FigmaToUnity.Editor
             _cancelButton.SetEnabled(isBusy);
             _tokenField.SetEnabled(!isBusy);
             _urlField.SetEnabled(!isBusy);
-            _outputField.SetEnabled(!isBusy);
-            _prefabOutputField.SetEnabled(!isBusy);
+            _outputRow.SetEnabled(!isBusy);
+            _prefabOutputRow.SetEnabled(!isBusy);
             _frameDepthField.SetEnabled(!isBusy);
             _spriteScaleField.SetEnabled(!isBusy);
             _maxConcurrentDownloadsField.SetEnabled(!isBusy);
