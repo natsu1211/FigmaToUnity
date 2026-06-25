@@ -197,40 +197,40 @@ namespace FigmaToUnity.Editor
             _prefabOutputField = new TextField("Prefab Folder");
             outputSection.Add(_prefabOutputField);
             _enableAutoComponentPrefabsToggle = new UIToggle("Auto Prefab for Top-Level Components");
-            _enableAutoComponentPrefabsToggle.tooltip = "有効にすると、Figma の最上位 COMPONENT/INSTANCE ノードを独立した Prefab として出力します。ネストされたコンポーネントは最も外側の祖先にベイクされます。デザインが小さな Prefab に分割されすぎるのを防ぐため既定では無効です。ノード名に `#prefab` を含むものは、このトグルに関係なく常に Prefab 化されます。";
+            _enableAutoComponentPrefabsToggle.tooltip = "When enabled, top-level Figma COMPONENT/INSTANCE nodes are exported as standalone Prefabs. Nested components are baked into their outermost ancestor. Disabled by default to avoid splitting the design into too many small Prefabs. Nodes whose name contains `#prefab` are always turned into Prefabs regardless of this toggle.";
             outputSection.Add(_enableAutoComponentPrefabsToggle);
             wrapper.Add(outputSection);
 
             // Mode
             VisualElement modeSection = MakeSection("Mode", "Import strategy and asset reuse.");
             _importModeField = new EnumField("Import Mode", ImportModeKind.FullImport);
-            _importModeField.tooltip = "FullImport: シーンをゼロから再構築します。DiffUpdate: 既存の FigmaSyncMarker 付き GameObject を新しい IR との差分でパッチします。";
+            _importModeField.tooltip = "FullImport: rebuilds the scene from scratch. DiffUpdate: patches existing GameObjects carrying a FigmaSyncMarker against the diff with the new IR.";
             modeSection.Add(_importModeField);
             _backendField = new EnumField("Output Backend", OutputBackend.UGUI);
-            _backendField.tooltip = "UGUI: GameObject + MonoBehaviour 階層を出力します（既定）。UIToolkit: Assets/UI/<file>/ 配下に UXML + USS を出力します（.generated.uss は毎回上書き、.uss ラッパーは初回のみ作成）。";
+            _backendField.tooltip = "UGUI: outputs a GameObject + MonoBehaviour hierarchy (default). UIToolkit: outputs UXML + USS under Assets/UI/<file>/ (.generated.uss is overwritten every time, the .uss wrapper is created only on the first run).";
             modeSection.Add(_backendField);
             _reuseSpritesToggle = new UIToggle("Reuse Existing Sprites");
-            _reuseSpritesToggle.tooltip = "Sprite Folder 配下に既存ファイルがあるスプライトの再ダウンロードをスキップします。再インポート時の帯域と Figma API クォータを節約できます。";
+            _reuseSpritesToggle.tooltip = "Skips re-downloading sprites that already have a file under the Sprite Folder. Saves bandwidth and Figma API quota on re-import.";
             modeSection.Add(_reuseSpritesToggle);
             wrapper.Add(modeSection);
 
             // Network
             VisualElement networkSection = MakeSection("Network", "Figma REST API parameters and download concurrency.");
             _frameDepthField = new IntegerField("Frame List Depth");
-            _frameDepthField.tooltip = "Frames 一覧取得時に /files へ渡す depth パラメータ。値を大きくするとドキュメントツリーをより深くまで取得しますが、リクエストが遅くなります。";
+            _frameDepthField.tooltip = "The depth parameter passed to /files when fetching the frame list. Larger values retrieve the document tree more deeply but make the request slower.";
             networkSection.Add(_frameDepthField);
             _spriteScaleField = new IntegerField("Sprite Scale");
-            _spriteScaleField.tooltip = "/images エンドポイントに渡す scale パラメータ。1 = 等倍、2 = 2倍（Retina 相当）など。ラスタライズされる PNG の解像度とダウンロードサイズに影響します。";
+            _spriteScaleField.tooltip = "The scale parameter passed to the /images endpoint. 1 = original size, 2 = 2x (Retina equivalent), etc. Affects the resolution and download size of the rasterized PNGs.";
             networkSection.Add(_spriteScaleField);
             _maxConcurrentDownloadsField = new IntegerField("Max Downloads");
-            _maxConcurrentDownloadsField.tooltip = "Figma CDN からスプライト PNG を並列ダウンロードする際の最大同時実行数。";
+            _maxConcurrentDownloadsField.tooltip = "The maximum number of concurrent requests when downloading sprite PNGs from the Figma CDN in parallel.";
             networkSection.Add(_maxConcurrentDownloadsField);
             wrapper.Add(networkSection);
 
             // Rendering
             VisualElement renderingSection = MakeSection("Rendering", "Runtime rendering parameters applied to imported assets.");
             _proceduralImageFalloffField = new FloatField("Procedural Falloff");
-            _proceduralImageFalloffField.tooltip = "ProceduralRoundedImage が使用するエッジのアンチエイリアス幅（ピクセル）。値を大きくするとエッジが滑らかになりますが、わずかにぼけます。";
+            _proceduralImageFalloffField.tooltip = "The edge anti-aliasing width (in pixels) used by ProceduralRoundedImage. Larger values make edges smoother but slightly blurrier.";
             renderingSection.Add(_proceduralImageFalloffField);
             wrapper.Add(renderingSection);
 
