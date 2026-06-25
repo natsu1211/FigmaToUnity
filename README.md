@@ -52,6 +52,10 @@ Then open `LongGames > Figma Importer` from the Unity Editor menu:
 2. Enter your Figma design URL in the project's **Figma URL** field and press **Fetch Frames**.
 3. Select the frames you want and press **Import Selected**.
 
+<img width="503" height="197" alt="image" src="https://github.com/user-attachments/assets/2cfd877e-ffe4-4ee0-96e6-7030e422b8fa" />
+<img width="503" height="185" alt="image" src="https://github.com/user-attachments/assets/fc25c5ac-1bed-47b1-9979-ce928b786236" />
+
+
 ### Output Backend
 
 Choose the destination with the **Output Backend** setting in the window:
