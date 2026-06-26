@@ -7,7 +7,7 @@ namespace FigmaToUnity.Runtime
     [AddComponentMenu("UI/Procedural Rounded Image")]
     public sealed class ProceduralRoundedImage : Image
     {
-        private const string ShaderName = "LongGames/UI/Procedural Rounded Image";
+        private const string ShaderName = "FigmaToUnity/UI/Procedural Rounded Image";
 
         private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
         private static readonly int UseUiAlphaClipId = Shader.PropertyToID("_UseUIAlphaClip");
