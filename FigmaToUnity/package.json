@@ -1,7 +1,7 @@
 {
   "name": "com.longgames.figma-to-unity",
   "displayName": "Figma To Unity",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "unity": "2022.3",
   "license": "MIT",
   "description": "Unity Editor package for importing Figma frame trees into Unity UI (UGUI and UIToolkit).",
